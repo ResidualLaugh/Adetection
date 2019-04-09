@@ -7,9 +7,11 @@
 # Install
 
 语言环境
+
 For Python2.7
 
 安装依赖
+
 pip install censys
 
 注册censys账号，替换脚本中的UID和SECRET
@@ -19,5 +21,6 @@ pip install censys
 python Adetection.py target.com
 
 结果会存在当前目录下的txt中
+
 注意：每个免费账号每月仅250次查询机会，不够用的话可以多注册几个
 
