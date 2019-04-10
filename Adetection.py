@@ -66,7 +66,7 @@ def censys_ipv4(domain):
              '110.pop3.starttls.tls.certificate.parsed.subject_dn']
     try:
         c = censys.ipv4.CensysIPv4(api_id=UID, api_secret=SECRET)
-        data = list(c.search("443.https.tls.certificate.parsed.names: %s or 25.smtp.starttls.tls.certificate.parsed.names: %s or 110.pop3.starttls.tls.certificate.parsed.names: %s" %(domain,domain,domain), IPV4_FIELDS, max_records = 1000))
+        data = list(c.search("(80.http.get.status_code: 200 or 443.https.get.status_code: 200) and 443.https.tls.certificate.parsed.names: %s or 25.smtp.starttls.tls.certificate.parsed.names: %s or 110.pop3.starttls.tls.certificate.parsed.names: %s" %(domain,domain,domain), IPV4_FIELDS, max_records = 1000))
         if len(data)>999:
             data = data[:999]
         for i in data:
