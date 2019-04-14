@@ -12,6 +12,7 @@ import optparse
 import censys
 import censys.certificates
 import censys.ipv4
+from IPy import IPSet, IP
 
 UID = "your censys api UID"
 SECRET = "your censys api SECRET"
@@ -47,6 +48,7 @@ def censys_sub_domain(domain):
 def censys_ipv4(domain):
     print u"[-] Start find real ip.."
     results = []
+    ip_list = []
     IPV4_FIELDS = ['ip',
              'ports',
              'location.country',
@@ -70,6 +72,7 @@ def censys_ipv4(domain):
         if len(data)>999:
             data = data[:999]
         for i in data:
+            ip_list.append(i['ip'])
             results.append({'ip': i['ip'],
                     'ports': i['ports'],
                     'location': getv(i,'location.country') or '' + ' ' + getv(i,'location.province') or '',
@@ -88,9 +91,9 @@ def censys_ipv4(domain):
         # catch the Censys Base exception, example "only 1000 first results are available"
         print '[-] Something bad happened, ' + repr(e)
     finally:
-        return results
+        return results,ip_list
 
-def output(domain,subdomains,results):
+def output(domain,subdomains,results,ip_c):
     y_domains = []
     with open(os.path.join(domain+'.txt'),'w') as f:
         for result in results:
@@ -103,9 +106,23 @@ def output(domain,subdomains,results):
         for sdomain in list(set(subdomains) - set(y_domains)):
             f.writelines(sdomain+'\n')
         print u"[-] The above information has been output to %s" %os.path.join(domain+'.txt')
+    with open(os.path.join(domain+'_c.txt'),'w') as f:
+        print u"[-] You can focus on these C-segments"
+        for ip in ip_c:
+            print ip
+            f.writelines(str(ip)+'\n')
+
+def ip_list2c(ip_list):
+    ips = []
+    for i in ip_list:
+        ips.append(IP(i+'/24', make_net=True))
+    for j in ips:
+        if ips.count(j) < 2:
+            ips.remove(j)
+    return IPSet(ips)
 
 if __name__ == '__main__':
-    parser = optparse.OptionParser('usage: %prog target.com', version="%prog 1.0.0")
+    parser = optparse.OptionParser('usage: %prog target.com', version="%prog 1.0.1")
     (options, args) = parser.parse_args()
     if len(args) < 1:
         parser.print_help()
@@ -113,6 +130,8 @@ if __name__ == '__main__':
     domain = args[0]
     subdomains = censys_sub_domain(domain)
     subdomains = subdomains['subdomains']
-    results = censys_ipv4(domain)
-    output(domain,subdomains,results)
+    results, ip_list = censys_ipv4(domain)
+    output(domain, subdomains, results, ip_list2c(ip_list))
+
+
 
