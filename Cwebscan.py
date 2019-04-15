@@ -128,7 +128,7 @@ def main():
     banner()
     parser = argparse.ArgumentParser(description='Example: python {} [-u ip|domain -r file -p 8080,9090] '.format(sys.argv[0]))
     # parser.add_argument('target', help=u'192.168.1.1/www.baidu.com(默认扫描80端口)')
-    parser.add_argument('-u', rype=str, default='127.0.0.1', dest='target', help=u'192.168.1.1/www.baidu.com(默认扫描80端口)')
+    parser.add_argument('-u', type=str, default='127.0.0.1', dest='target', help=u'192.168.1.1/www.baidu.com(默认扫描80端口)')
     parser.add_argument('-t', type=int, default=50, dest='threads', help=u'线程数(默认50)')
     parser.add_argument('-r', type=str, dest='read_file', help=u'线程数(默认50)')
     parser.add_argument('-p', default=False, dest='custom_ports', help=u'自定义扫描端口(如-p8080,9090)')
